@@ -3,10 +3,9 @@ server:
 
 spring:
   datasource:
-    url: ${DB_URL}  # Database connection URL
-    username: ${DB_USERNAME}  # Database username
-    password: ${DB_PASSWORD}  # Database password
-    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL driver class
+    url: jdbc:mysql://localhost:3306/tooldb
+    username: root
+    password: lion
 
   jpa:
     hibernate:
