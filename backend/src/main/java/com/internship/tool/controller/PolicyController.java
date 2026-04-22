@@ -4,6 +4,7 @@ import com.internship.tool.entity.Policy;
 import com.internship.tool.service.PolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -15,9 +16,9 @@ public class PolicyController {
     private PolicyService policyService;
 
     // Create a new policy
-    @PostMapping
-    public Policy createPolicy(@RequestBody Policy policy) {
-        return policyService.createPolicy(policy);
+   @PostMapping
+    public Policy createPolicy(@Valid @RequestBody Policy policy) {
+    return policyService.createPolicy(policy);
     }
 
     // Get all policies

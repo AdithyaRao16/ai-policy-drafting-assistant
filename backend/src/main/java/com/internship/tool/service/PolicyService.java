@@ -1,19 +1,20 @@
 package com.internship.tool.service;
 
 import com.internship.tool.entity.Policy;
+import com.internship.tool.exception.ResourceNotFoundException;
 import com.internship.tool.repository.PolicyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service // Marks this class as service layer (business logic)
+@Service // Business logic layer
 public class PolicyService {
 
-    @Autowired // Injects PolicyRepository dependency
+    @Autowired
     private PolicyRepository policyRepository;
 
-    // Save a new policy
+    // Create policy
     public Policy createPolicy(Policy policy) {
         return policyRepository.save(policy);
     }
@@ -23,13 +24,15 @@ public class PolicyService {
         return policyRepository.findAll();
     }
 
-    // Get policy by ID
+    // Get policy by ID (with exception handling)
     public Policy getPolicyById(Long id) {
-        return policyRepository.findById(id).orElse(null);
+        return policyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Policy not found with id: " + id));
     }
 
-    // Delete policy by ID
+    // Delete policy (safe delete)
     public void deletePolicy(Long id) {
-        policyRepository.deleteById(id);
+        Policy policy = getPolicyById(id); // ensures it exists
+        policyRepository.delete(policy);
     }
 }

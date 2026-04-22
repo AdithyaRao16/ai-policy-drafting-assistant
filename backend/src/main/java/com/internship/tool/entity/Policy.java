@@ -1,5 +1,6 @@
 package com.internship.tool.entity;
 
+import jakarta.validation.constraints.*; // Validation annotations
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,35 +9,39 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Entity // Marks this class as a JPA entity (maps to DB table)
-@Table(name = "policies") // Specifies table name in database
-@EntityListeners(AuditingEntityListener.class) // Enables auditing (auto timestamps)
-@Data // Lombok: generates getters, setters, toString, etc.
-@NoArgsConstructor // Lombok: no-args constructor
-@AllArgsConstructor // Lombok: all-args constructor
-@Builder // Lombok: builder pattern
+@Entity // Maps class to DB table
+@Table(name = "policies") // Table name
+@EntityListeners(AuditingEntityListener.class) // Enables auditing
+@Data // Lombok: getters, setters
+@NoArgsConstructor // No-args constructor
+@AllArgsConstructor // All-args constructor
+@Builder // Builder pattern
 public class Policy {
 
     @Id // Primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto increment
     private Long id;
 
-    @Column(nullable = false) // Column cannot be null
+    @NotBlank(message = "Title is required") // Validation
+    @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT") // Stores large text
+    @NotBlank(message = "Description is required") // Validation
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column // Default column mapping
+    @NotBlank(message = "Category is required") // Validation
+    @Column
     private String category;
 
-    @Column // Default column mapping
+    @NotBlank(message = "Status is required") // Validation
+    @Column
     private String status;
 
-    @CreatedDate // Automatically sets creation timestamp
-    @Column(updatable = false) // Prevents update after creation
+    @CreatedDate // Auto set creation time
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate // Automatically updates timestamp on modification
+    @LastModifiedDate // Auto update time
     private LocalDateTime updatedAt;
 }
