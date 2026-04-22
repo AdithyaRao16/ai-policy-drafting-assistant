@@ -1,0 +1,14 @@
+# Environment variables
+.env
+
+# Maven build folder
+target/
+
+# Node modules
+node_modules/
+
+# Python cache
+__pycache__/
+
+# Chroma DB data
+chroma_data/
