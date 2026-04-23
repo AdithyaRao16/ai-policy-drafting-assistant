@@ -2,40 +2,46 @@ package com.internship.tool.controller;
 
 import com.internship.tool.entity.Policy;
 import com.internship.tool.service.PolicyService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RestController // Marks this class as REST API controller
-@RequestMapping("/api/policies") // Base URL for all endpoints
+@RestController
+@RequestMapping("/api/policies")
 public class PolicyController {
 
-    @Autowired // Injects PolicyService
+    @Autowired
     private PolicyService policyService;
 
-    // Create a new policy
-   @PostMapping
-    public Policy createPolicy(@Valid @RequestBody Policy policy) {
-    return policyService.createPolicy(policy);
+    // GET /all (Paginated)
+    @GetMapping("/all")
+    public ResponseEntity<Page<Policy>> getAllPolicies(Pageable pageable) {
+        Page<Policy> policies = policyService.getAllPolicies(pageable);
+        return ResponseEntity.ok(policies);
     }
 
-    // Get all policies
-    @GetMapping
-    public List<Policy> getAllPolicies() {
-        return policyService.getAllPolicies();
-    }
-
-    // Get policy by ID
+    // GET /{id} with 404 handling
     @GetMapping("/{id}")
-    public Policy getPolicyById(@PathVariable Long id) {
-        return policyService.getPolicyById(id);
+    public ResponseEntity<Policy> getPolicyById(@PathVariable Long id) {
+        Policy policy = policyService.getPolicyById(id);
+        return ResponseEntity.ok(policy);
     }
 
-    // Delete policy by ID
+    // POST /create with validation
+    @PostMapping("/create")
+    public ResponseEntity<Policy> createPolicy(@Valid @RequestBody Policy policy) {
+        Policy savedPolicy = policyService.createPolicy(policy);
+        return new ResponseEntity<>(savedPolicy, HttpStatus.CREATED);
+    }
+
+    // DELETE 
     @DeleteMapping("/{id}")
-    public void deletePolicy(@PathVariable Long id) {
+    public ResponseEntity<String> deletePolicy(@PathVariable Long id) {
         policyService.deletePolicy(id);
+        return ResponseEntity.ok("Policy deleted successfully");
     }
 }

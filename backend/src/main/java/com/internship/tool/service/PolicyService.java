@@ -5,6 +5,8 @@ import com.internship.tool.exception.ResourceNotFoundException;
 import com.internship.tool.repository.PolicyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,8 +22,8 @@ public class PolicyService {
     }
 
     // Get all policies
-    public List<Policy> getAllPolicies() {
-        return policyRepository.findAll();
+    public Page<Policy> getAllPolicies(Pageable pageable) {
+    return policyRepository.findAll(pageable);
     }
 
     // Get policy by ID (with exception handling)
