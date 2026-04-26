@@ -17,16 +17,24 @@ public class PolicyController {
         this.policyRepository = policyRepository;
     }
 
-    // ✅ 1. GET ALL POLICIES
-    @GetMapping
-    public List<Policy> getAllPolicies() {
-        return policyRepository.findAll();
+    // ✅ CREATE POLICY
+    @PostMapping
+    public Policy createPolicy(@RequestBody Policy policy) {
+        policy.setIsDeleted(false);
+        policy.setCreatedAt(LocalDateTime.now());
+        return policyRepository.save(policy);
     }
 
-    // ✅ 2. UPDATE POLICY
+    // ✅ GET ALL (ONLY ACTIVE)
+    @GetMapping
+    public List<Policy> getAllPolicies() {
+        return policyRepository.findByIsDeletedFalse();
+    }
+
+    // ✅ UPDATE POLICY
     @PutMapping("/{id}")
     public Policy updatePolicy(@PathVariable UUID id,
-                               @RequestBody Policy updatedPolicy) {
+                                @RequestBody Policy updatedPolicy) {
 
         Policy policy = policyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Policy not found"));
@@ -39,13 +47,8 @@ public class PolicyController {
 
         return policyRepository.save(policy);
     }
-    @PostMapping
-    public Policy createPolicy(@RequestBody Policy policy) {
-    policy.setIsDeleted(false);
-    policy.setCreatedAt(java.time.LocalDateTime.now());
-    return policyRepository.save(policy);
-    }
-    // ✅ 3. SOFT DELETE POLICY
+
+    // ✅ SOFT DELETE
     @DeleteMapping("/{id}")
     public String deletePolicy(@PathVariable UUID id) {
 
@@ -58,24 +61,25 @@ public class PolicyController {
         return "Policy soft deleted successfully";
     }
 
-    // ✅ 4. SEARCH API
+    // ✅ SEARCH
     @GetMapping("/search")
     public List<Policy> searchPolicies(@RequestParam String q) {
         return policyRepository.searchPolicies(q);
     }
 
-    // ✅ 5. STATS API
+    // ✅ STATS (FIXED)
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
 
+        List<Policy> activePolicies = policyRepository.findByIsDeletedFalse();
         List<Policy> allPolicies = policyRepository.findAll();
 
-        long total = allPolicies.size();
-        long active = allPolicies.stream()
+        long total = activePolicies.size();
+        long active = activePolicies.stream()
                 .filter(p -> "ACTIVE".equalsIgnoreCase(p.getStatus()))
                 .count();
 
-        long draft = allPolicies.stream()
+        long draft = activePolicies.stream()
                 .filter(p -> "DRAFT".equalsIgnoreCase(p.getStatus()))
                 .count();
 

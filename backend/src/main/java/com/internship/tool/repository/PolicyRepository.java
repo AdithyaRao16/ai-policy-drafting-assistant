@@ -3,26 +3,17 @@ package com.internship.tool.repository;
 import com.internship.tool.entity.Policy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
 import java.util.List;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Repository
 public interface PolicyRepository extends JpaRepository<Policy, UUID> {
 
-    // Search
-    @Query("SELECT p FROM Policy p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Policy> searchPolicies(String keyword);
+    // ✅ Only non-deleted policies
+    List<Policy> findByIsDeletedFalse();
 
-    // Filter by status
-    List<Policy> findByStatus(String status);
-
-    // Filter by category
-    List<Policy> findByCategory(String category);
-
-    // Date range
-    @Query("SELECT p FROM Policy p WHERE p.createdAt BETWEEN :startDate AND :endDate")
-    List<Policy> findByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    // ✅ Search (your existing method assumed)
+    @Query("SELECT p FROM Policy p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%')) " +
+           "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :q, '%'))")
+    List<Policy> searchPolicies(String q);
 }
