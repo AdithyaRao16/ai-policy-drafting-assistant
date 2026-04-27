@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No sessions
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll() // Public endpoints
+                .requestMatchers("/auth/**", "/api/policies/**").permitAll() // Public endpoints
                 .anyRequest().authenticated() // Secure all others
             )
 
