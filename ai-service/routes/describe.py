@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify
+from datetime import datetime
 from prompts.describe_prompt import build_describe_prompt
+from services.groq_client import call_groq
 
 describe_bp = Blueprint("describe", __name__)
+
 
 @describe_bp.route("/describe", methods=["POST"])
 def describe():
@@ -15,12 +18,15 @@ def describe():
     try:
         prompt = build_describe_prompt(user_input)
 
+        ai_response = call_groq(prompt)
+
         return jsonify({
             "status": "success",
             "data": {
-                "prompt": prompt
-            },
-            "message": "Prompt generated successfully"
+                "input": user_input,
+                "output": ai_response,
+                "generated_at": datetime.utcnow().isoformat()
+            }
         }), 200
 
     except Exception as e:

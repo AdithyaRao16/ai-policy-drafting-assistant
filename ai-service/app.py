@@ -1,22 +1,34 @@
 from flask import Flask
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 
 def create_app():
     app = Flask(__name__)
     CORS(app)
 
+    #  Import all blueprints inside function (best practice)
     from routes.describe import describe_bp
     from routes.recommend import recommend_bp
+    from routes.categorise import categorise_bp
 
+    # Register all routes
     app.register_blueprint(describe_bp, url_prefix="/api")
     app.register_blueprint(recommend_bp, url_prefix="/api")
+    app.register_blueprint(categorise_bp, url_prefix="/api")
 
-    @app.route("/health")
+    # Health check
+    @app.route("/health", methods=["GET"])
     def health():
         return {"status": "ok"}, 200
 
     return app
 
+
+# Entry point
 if __name__ == "__main__":
     app = create_app()
     app.run(host="0.0.0.0", port=5000, debug=True)
