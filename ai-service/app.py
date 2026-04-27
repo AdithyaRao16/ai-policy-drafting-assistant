@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
+from services.rag_pipeline import ingest_documents, collection
+import os
 
 # Load environment variables
 load_dotenv()
@@ -9,6 +11,21 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     CORS(app)
+
+    with app.app_context():
+        try:
+            existing_docs = collection.count()
+
+            if existing_docs == 0:
+                print("No documents found. Ingesting into ChromaDB...")
+                ingest_documents()
+            else:
+                print(f" ChromaDB already has {existing_docs} documents. Skipping ingestion.")
+
+        except Exception as e:
+            print(f" Error checking ChromaDB: {e}")
+            print(" Attempting ingestion...")
+            ingest_documents()
 
     #  Import all blueprints inside function (best practice)
     from routes.describe import describe_bp
