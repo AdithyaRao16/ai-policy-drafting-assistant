@@ -44,4 +44,7 @@ public class Policy {
 
     @LastModifiedDate // Auto update time
     private LocalDateTime updatedAt;
+
+    @Column
+    private LocalDateTime dueDate; // used for overdue check
 }

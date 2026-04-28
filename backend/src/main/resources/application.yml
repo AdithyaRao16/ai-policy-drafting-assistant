@@ -27,3 +27,16 @@ spring:
 jwt:
   secret: ${JWT_SECRET}  # Secret key for JWT
   expiration: 86400000  # Token expiration time (in milliseconds)
+
+  # spring:
+  # mail:
+  #   host: smtp.gmail.com        # Gmail SMTP server for sending emails
+  #   port: 587                   # Standard TLS port for email communication
+  #   username: email@gmail.com   # Sender email address
+  #   password: password      # Gmail App Password (not regular password)
+  #   properties:
+  #     mail:
+  #       smtp:
+  #         auth: true            # Enables authentication with email server
+  #         starttls:
+  #           enable: true        # Enables secure TLS connection
