@@ -1,98 +1,47 @@
 package com.internship.tool.controller;
 
 import com.internship.tool.entity.Policy;
-import com.internship.tool.repository.PolicyRepository;
+import com.internship.tool.service.PolicyService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
 @RestController
-@RequestMapping("/policies")
+@RequestMapping("/api/policies")
 public class PolicyController {
 
-    private final PolicyRepository policyRepository;
+    @Autowired
+    private PolicyService policyService;
 
-    public PolicyController(PolicyRepository policyRepository) {
-        this.policyRepository = policyRepository;
+    // GET /all (Paginated)
+    @GetMapping("/all")
+    public ResponseEntity<Page<Policy>> getAllPolicies(Pageable pageable) {
+        Page<Policy> policies = policyService.getAllPolicies(pageable);
+        return ResponseEntity.ok(policies);
     }
 
-    // ✅ CREATE POLICY
-    @PostMapping
-    public Policy createPolicy(@RequestBody Policy policy) {
-        policy.setIsDeleted(false);
-        policy.setCreatedAt(LocalDateTime.now());
-        return policyRepository.save(policy);
+    // GET /{id} with 404 handling
+    @GetMapping("/{id}")
+    public ResponseEntity<Policy> getPolicyById(@PathVariable Long id) {
+        Policy policy = policyService.getPolicyById(id);
+        return ResponseEntity.ok(policy);
     }
 
-    // ✅ GET ALL (ONLY ACTIVE)
-    @GetMapping
-    public List<Policy> getAllPolicies() {
-        return policyRepository.findByIsDeletedFalse();
+    // POST /create with validation
+    @PostMapping("/create")
+    public ResponseEntity<Policy> createPolicy(@Valid @RequestBody Policy policy) {
+        Policy savedPolicy = policyService.createPolicy(policy);
+        return new ResponseEntity<>(savedPolicy, HttpStatus.CREATED);
     }
 
-    // ✅ UPDATE POLICY
-    @PutMapping("/{id}")
-    public Policy updatePolicy(@PathVariable UUID id,
-                                @RequestBody Policy updatedPolicy) {
-
-        Policy policy = policyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Policy not found"));
-
-        policy.setTitle(updatedPolicy.getTitle());
-        policy.setDescription(updatedPolicy.getDescription());
-        policy.setCategory(updatedPolicy.getCategory());
-        policy.setStatus(updatedPolicy.getStatus());
-        policy.setUpdatedAt(LocalDateTime.now());
-
-        return policyRepository.save(policy);
-    }
-
-    // ✅ SOFT DELETE
+    // DELETE 
     @DeleteMapping("/{id}")
-    public String deletePolicy(@PathVariable UUID id) {
-
-        Policy policy = policyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Policy not found"));
-
-        policy.setIsDeleted(true);
-        policyRepository.save(policy);
-
-        return "Policy soft deleted successfully";
-    }
-
-    // ✅ SEARCH
-    @GetMapping("/search")
-    public List<Policy> searchPolicies(@RequestParam String q) {
-        return policyRepository.searchPolicies(q);
-    }
-
-    // ✅ STATS (FIXED)
-    @GetMapping("/stats")
-    public Map<String, Object> getStats() {
-
-        List<Policy> activePolicies = policyRepository.findByIsDeletedFalse();
-        List<Policy> allPolicies = policyRepository.findAll();
-
-        long total = activePolicies.size();
-        long active = activePolicies.stream()
-                .filter(p -> "ACTIVE".equalsIgnoreCase(p.getStatus()))
-                .count();
-
-        long draft = activePolicies.stream()
-                .filter(p -> "DRAFT".equalsIgnoreCase(p.getStatus()))
-                .count();
-
-        long deleted = allPolicies.stream()
-                .filter(p -> Boolean.TRUE.equals(p.getIsDeleted()))
-                .count();
-
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("total", total);
-        stats.put("active", active);
-        stats.put("draft", draft);
-        stats.put("deleted", deleted);
-
-        return stats;
+    public ResponseEntity<String> deletePolicy(@PathVariable Long id) {
+        policyService.deletePolicy(id);
+        return ResponseEntity.ok("Policy deleted successfully");
     }
 }

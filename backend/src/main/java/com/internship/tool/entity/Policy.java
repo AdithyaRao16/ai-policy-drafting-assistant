@@ -1,105 +1,50 @@
 package com.internship.tool.entity;
 
+import jakarta.validation.constraints.*; // Validation annotations
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Entity
-@Table(name = "policies")
+import java.time.LocalDateTime;
+
+@Entity // Maps class to DB table
+@Table(name = "policies") // Table name
+@EntityListeners(AuditingEntityListener.class) // Enables auditing
+@Data // Lombok: getters, setters
+@NoArgsConstructor // No-args constructor
+@AllArgsConstructor // All-args constructor
+@Builder // Builder pattern
 public class Policy {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+    @Id // Primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto increment
+    private Long id;
 
+    @NotBlank(message = "Title is required") // Validation
     @Column(nullable = false)
     private String title;
 
+    @NotBlank(message = "Description is required") // Validation
+    @Column(columnDefinition = "TEXT")
     private String description;
 
+    @NotBlank(message = "Category is required") // Validation
+    @Column
     private String category;
 
+    @NotBlank(message = "Status is required") // Validation
+    @Column
     private String status;
 
-    private String createdBy;
-
+    @CreatedDate // Auto set creation time
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate // Auto update time
     private LocalDateTime updatedAt;
 
-    private Boolean isDeleted;
-
-    // Getters and Setters
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Boolean getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Boolean deleted) {
-        isDeleted = deleted;
-    }
+    @Column
+    private LocalDateTime dueDate; // used for overdue check
 }
